@@ -204,12 +204,13 @@ app.delete('/Deletejsondata', async (req, res) => {
 app.get('/userByAge',async (req, res) => {
     const inputAge = req.query.age;
     //console.log(typeof(inputAge))
-        if(!inputAge)
+        if(!inputAge){
             return res.status(400).json({message: "Please enter an age"})
+        }
     //console.log(parseInt(inputAge))
         parseInputAge = parseInt(inputAge)
         if(isNaN(parseInputAge)){
-        res.status(400).json({
+            res.status(400).json({
                 error : { 
                     message: "You are suppose to enter number"
                 }
@@ -217,33 +218,33 @@ app.get('/userByAge',async (req, res) => {
         }
         else{
             fs.readFile("./generated.json", "utf8", (err, data) => {
-        if (err) {
-            console.log("File read failed:", err);
-            res.status(500).json({
-                error: {
-                    message: "Error retrieving the data"
-                }
-            })
-        } else {
-            obj = JSON.parse(data)
-            var dataArray = obj.new_data;
-            let result = []
-            for(i =0 ; i < dataArray.length; i++) {
-                if(dataArray[i].age > inputAge){
+            if (err) {
+                console.log("File read failed:", err);
+                    res.status(500).json({
+                        error: {
+                            message: "Error retrieving the data"
+                        }
+                     })
+            } else {
+                obj = JSON.parse(data)
+                var dataArray = obj.new_data;
+                let result = []
+                for(i =0 ; i < dataArray.length; i++) {
+                    if(dataArray[i].age > inputAge){
                     //console.log(dataArray[i].name)
-                    names = dataArray[i].name
-                    result.push(names);
+                        names = dataArray[i].name
+                        result.push(names);
+                    }
                 }
-            }
-            if(result.length == 0)
-                res.status(200).json({message:"No person found"})
+                if(result.length == 0)
+                    res.status(200).json({message:"No person found"})
                 
-            else{
-                res.status(200).json(result)
+                else{
+                    res.status(200).json(result)
                 }
             } 
         });
-    }   
+    } 
 })
 
 
@@ -251,19 +252,6 @@ app.get('/usersByDate', async (req, res) => {
     const inputDate = req.query.date;
 
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 app.listen(port, () => {
     console.log('The server is running on port', port);
