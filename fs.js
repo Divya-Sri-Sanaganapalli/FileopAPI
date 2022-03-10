@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 //var newData = JSON.stringify(data);
 app.use(bodyParser.json());
 
+const { check, validationResult } = require('express-validator');
+
 // US1 - Retrieve all the records from the json file
 app.get('/readJsonData', async (req, res) => {
     fs.readFile("./data.json", "utf8", (err, data) => {
@@ -34,7 +36,7 @@ app.get('/readJsonData', async (req, res) => {
 // The below method will work upto 100 MB. For more we need to use db.
 
 // US 2 - Add a record to the json file
-app.post('/Writejsondata', async (req, res) => {
+app.post('/Writejsondata', [check('id').isNumeric(), check('name').isLength({min: 3}), check(order_count).isNumeric(), check('address').isLength({min:5})], (req, res) => {
     const id = req.query.id;
     const name = req.query.name;
     const order_count = req.query.order_count;
@@ -101,11 +103,14 @@ app.post('/Writejsondata', async (req, res) => {
 
 // US 3 - update an existing record to a json file
 
-app.put('/Updatejsondata', async (req, res) => {
+app.put('/Updatejsondata', [check('id').isNumeric(), check('name').isLength({min: 3}), check(order_count).isNumeric(), check('address').isLength({min:5})],async (req, res) => {
     const id = req.query.id;
     const name = req.query.name;
     const order_count = req.query.order_count;
     const address = req.query.address;
+    if(!id)
+        return res.status(400).json({message: "Please enter an id"})
+
     fs.readFile('./data.json', 'utf8', function readFileCallback(err, data) {
         if (err) {
             console.log("File read failed:", err);
@@ -148,6 +153,8 @@ app.put('/Updatejsondata', async (req, res) => {
 // US 4 - Delete a record in json file 
 app.delete('/Deletejsondata', async (req, res) => {
     const id = req.query.id;
+    if(!id)
+        return res.status(400).json({message: "Please enter an id"})
     fs.readFile('./data.json', 'utf8', function readFileCallback(err, data) {
         if (err) {
             console.log("File read failed:", err);
