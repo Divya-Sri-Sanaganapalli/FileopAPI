@@ -36,7 +36,7 @@ app.get('/readJsonData', async (req, res) => {
 // The below method will work upto 100 MB. For more we need to use db.
 
 // US 2 - Add a record to the json file
-app.post('/Writejsondata', [check('id').isNumeric(), check('name').isLength({min: 3}), check(order_count).isNumeric(), check('address').isLength({min:5})], (req, res) => {
+app.post('/Writejsondata', [check('id').isNumeric(), check('name').isLength({min: 3}), check('order_count').isNumeric(), check('address').isLength({min:5})], (req, res) => {
     const id = req.query.id;
     const name = req.query.name;
     const order_count = req.query.order_count;
@@ -103,7 +103,7 @@ app.post('/Writejsondata', [check('id').isNumeric(), check('name').isLength({min
 
 // US 3 - update an existing record to a json file
 
-app.put('/Updatejsondata', [check('id').isNumeric(), check('name').isLength({min: 3}), check(order_count).isNumeric(), check('address').isLength({min:5})],async (req, res) => {
+app.put('/Updatejsondata', [check('id').isNumeric(), check('name').isLength({min: 3}), check('order_count').isNumeric(), check('address').isLength({min:5})],async (req, res) => {
     const id = req.query.id;
     const name = req.query.name;
     const order_count = req.query.order_count;
@@ -206,16 +206,17 @@ app.get('/userByAge',async (req, res) => {
     //console.log(typeof(inputAge))
         if(!inputAge)
             return res.status(400).json({message: "Please enter an age"})
-    //convertInput = Number(inputAge)
-    //console.log(typeof(convertInput))
-    if(typeof(inputAge) == 'string'){
+    //console.log(parseInt(inputAge))
+        parseInputAge = parseInt(inputAge)
+        if(isNaN(parseInputAge)){
         res.status(400).json({
                 error : { 
-                    message: "You are suppose to enter number."
-            }
-        })
-    }
-    fs.readFile("./generated.json", "utf8", (err, data) => {
+                    message: "You are suppose to enter number"
+                }
+            })
+        }
+        else{
+            fs.readFile("./generated.json", "utf8", (err, data) => {
         if (err) {
             console.log("File read failed:", err);
             res.status(500).json({
@@ -239,9 +240,10 @@ app.get('/userByAge',async (req, res) => {
                 
             else{
                 res.status(200).json(result)
-            }
+                }
             } 
-    });
+        });
+    }   
 })
 
 
