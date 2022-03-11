@@ -269,7 +269,7 @@ app.get('/userByAge',async (req, res) => {
     } 
 })
 
-
+// US 6 - Retrieve user names who registered date is less than the input date
 app.get('/usersByDate', async (req, res) => {
     const inputDate = req.query.date;
     test = moment(inputDate, 'MM/DD/YYYY', true).isValid()
@@ -299,7 +299,6 @@ app.get('/usersByDate', async (req, res) => {
         //res.status(200).json({message: "Passed"})
                     obj = JSON.parse(data)
                     var dataArray = obj.newData;
-
                     let resultArray = []
                     for(i =0 ; i < dataArray.length; i++) {
                         //console.log(dataArray[i].registered)
