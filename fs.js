@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const port = 4000;
 const bodyParser = require('body-parser');
+const moment = require('moment');
+
 //var data= JSON.parse(data);
 //var newData = JSON.stringify(data);
 app.use(bodyParser.json());
@@ -244,10 +246,10 @@ app.get('/userByAge',async (req, res) => {
                     if(dataArray[i].age > inputAge){
                     //console.log(dataArray[i].name)
                         names = dataArray[i].name
-                        result.push(names);
+                        resultArray.push(names);
                     }
                 }
-                if(result.length == 0)
+                if(resultArray.length == 0)
                     res.status(200).json({
                         response: {
                             message: "No person found"
@@ -266,6 +268,72 @@ app.get('/userByAge',async (req, res) => {
         });
     } 
 })
+
+
+app.get('/usersByDate', async (req, res) => {
+    const inputDate = req.query.date;
+    test = moment(inputDate, 'MM/DD/YYYY', true).isValid()
+    console.log(test)
+    if (!test){
+        res.status(400).json({
+            response: {
+                error: {
+                    message: "Please provide date in MM/DD/YYYY format"
+                }
+                
+            }
+        })
+    }
+    else{
+        fs.readFile("./generated.json", "utf8", (err, data) => {
+            if (err) {
+                console.log("File read failed:", err);
+                    res.status(500).json({
+                        response: {
+                            error: {
+                                message: "Error retrieving the data"
+                            }
+                        }
+                    })
+            } else {
+        //res.status(200).json({message: "Passed"})
+                    obj = JSON.parse(data)
+                    var dataArray = obj.newData;
+
+                    let resultArray = []
+                    for(i =0 ; i < dataArray.length; i++) {
+                        //console.log(dataArray[i].registered)
+                        var strDate = dataArray[i].registered
+                        parsedDate = strDate.substring(0, 10);
+                        //console.log(val)
+                        var newFormatDate = new Date(parsedDate).toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" })
+                        console.log(newFormatDate,dataArray[i].name)
+                        if(inputDate > newFormatDate){
+                            names = dataArray[i].name
+                            //date = dataArray[i].registered
+                            //console.log(date)
+                            resultArray.push(names); 
+                        }
+                    }
+                    if(resultArray.length == 0)
+                            res.status(200).json({
+                                response: {
+                                    message: "No person found"
+                            }
+                        })
+                        
+                    else {
+                            res.status(200).json({
+                                response: {
+                                    result: resultArray
+                                }
+                        })
+                    }                        
+                }
+        })
+    }
+})
+
 
 
 app.listen(port, () => {
