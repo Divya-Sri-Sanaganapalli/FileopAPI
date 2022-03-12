@@ -10,6 +10,7 @@ const moment = require('moment');
 app.use(bodyParser.json());
 
 const { check, validationResult } = require('express-validator');
+const { off } = require("process");
 
 // US1 - Retrieve all the records from the json file
 app.get('/readJsonData', async (req, res) => {
@@ -202,7 +203,6 @@ app.delete('/Deletejsondata', async (req, res) => {
 })
 
 // US 5 - Retrieve user names who age is greater than the input age
-
 app.get('/userByAge',async (req, res) => {
     const inputAge = req.query.age;
     //console.log(typeof(inputAge))
@@ -227,7 +227,7 @@ app.get('/userByAge',async (req, res) => {
             })
         }
         else{
-            fs.readFile("./generated.json", "utf8", (err, data) => {
+            fs.readFile("./newData.json", "utf8", (err, data) => {
             if (err) {
                 console.log("File read failed:", err);
                     res.status(500).json({
@@ -285,7 +285,7 @@ app.get('/usersByDate', async (req, res) => {
         })
     }
     else{
-        fs.readFile("./generated.json", "utf8", (err, data) => {
+        fs.readFile("./newData.json", "utf8", (err, data) => {
             if (err) {
                 console.log("File read failed:", err);
                     res.status(500).json({
@@ -333,6 +333,52 @@ app.get('/usersByDate', async (req, res) => {
     }
 })
 
+
+// US 7 - Count the occurance of each tag type
+app.get('/countTags', async (req, res) => {
+    fs.readFile("./newData.json", "utf8", (err, data) => {
+        if (err) {
+            console.log("File read failed:", err)
+            res.status(500).json({
+                error: {
+                    message: "Error retrieving the data"
+                }
+            })
+        }else{
+            var obj = JSON.parse(data)
+            var dataArray = obj.newData
+            let combineTagsArray = []
+            for(i =0 ; i < dataArray.length; i++) {
+                for(j=0; j< dataArray[i].tags.length; j++){
+                    combineTagsArray.push(dataArray[i].tags[j])
+                }
+            }
+            //console.log(combineTagsArray)
+            const countTags = {};
+            for (k=0; k< combineTagsArray.length; k++){
+                eachTag = combineTagsArray[k]
+                if(countTags[eachTag] == undefined){
+                    countTags[eachTag] = 1
+                } else{
+                    countTags[eachTag] += 1
+                }
+            }
+            var resultArray = [];
+            for (const [key, value] of Object.entries(countTags)) {
+                resultArray.push({
+                    tag: key,
+                    count: value
+                })
+                //console.log(key, value);
+            }
+            res.status(200).json({
+                            response:{
+                                result : resultArray
+                            }
+                        })
+        }
+    })
+})
 
 
 app.listen(port, () => {
