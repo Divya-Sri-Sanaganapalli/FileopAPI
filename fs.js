@@ -380,6 +380,115 @@ app.get('/countTags', async (req, res) => {
     })
 })
 
+// US 8 - Retrieve the user id and name where gender is female, isActive and with 'ea' as tag
+app.get('/conditionalCheckV1', async (req, res) => {
+    fs.readFile("./newData.json", "utf8", (err, data) => {
+        if (err) {
+            console.log("File read failed:", err)
+            res.status(500).json({
+                error: {
+                    message: "Error retrieving the data"
+                }
+            })
+        }else{
+            var obj = JSON.parse(data)
+            var dataArray = obj.newData
+            var resultArray = [];
+            for(i =0 ; i < dataArray.length; i++) {
+                for(j=0; j< dataArray[i].tags.length; j++){
+                     //This will unnecessarily loop to check the first gender and isActive condition so check V2
+                    if((dataArray[i].gender == "female") && (dataArray[i].isActive) && (dataArray[i].tags[j] == 'ea')){ 
+                        //res.send(dataArray[i].name)
+                        resultArray.push({
+                            id: dataArray[i].id,
+                            name: dataArray[i].name
+                        })
+                    }
+                }   
+            }
+            //console.log(resultArray);
+            res.status(200).json({
+            response:{
+                result : resultArray
+                    }
+            })    
+
+        }
+    })
+})
+
+app.get('/conditionalCheckV2', async (req, res) => {
+    fs.readFile("./newData.json", "utf8", (err, data) => {
+        if (err) {
+            console.log("File read failed:", err)
+            res.status(500).json({
+                error: {
+                    message: "Error retrieving the data"
+                }
+            })
+        }else{
+            var obj = JSON.parse(data)
+            var dataArray = obj.newData
+            var resultArray = [];
+            for(i =0 ; i < dataArray.length; i++) {
+                if((dataArray[i].gender == "female") && (dataArray[i].isActive)){
+                    //for condition to iterate tags array. This can be even better simplified. Check V3
+                    for(j=0; j< dataArray[i].tags.length; j++){ 
+                        if(dataArray[i].tags[j] == 'ea'){  
+                        //res.send(dataArray[i].name)
+                            resultArray.push({
+                                id: dataArray[i].id,
+                                name: dataArray[i].name
+                            })
+                            break;
+                        }
+                    }
+                }   
+            }
+            //console.log(resultArray);
+            res.status(200).json({
+            response:{
+                result : resultArray
+                    }
+            })    
+
+        }
+    })
+})
+
+app.get('/conditionalCheckV3', async (req, res) => {
+    fs.readFile("./newData.json", "utf8", (err, data) => {
+        if (err) {
+            console.log("File read failed:", err)
+            res.status(500).json({
+                error: {
+                    message: "Error retrieving the data"
+                }
+            })
+        }else{
+            var obj = JSON.parse(data)
+            var dataArray = obj.newData
+            var resultArray = [];
+            for(i =0 ; i < dataArray.length; i++) {
+                // Instead of iterating the tags array, indexOf will give the index of ea and will not iterate furthur. 
+                if((dataArray[i].gender == "female") && (dataArray[i].isActive) && (dataArray[i].tags.indexOf("ea")!=-1)){
+                        //res.send(dataArray[i].name)
+                            resultArray.push({
+                                id: dataArray[i].id,
+                                name: dataArray[i].name
+                            })
+                }
+            }   
+            console.log(resultArray);
+            res.status(200).json({
+            response:{
+                result : resultArray
+                    }
+            })    
+
+        }
+    })
+})
 
 app.listen(port, () => {
     console.log('The server is running on port', port);
