@@ -490,6 +490,59 @@ app.get('/conditionalCheckV3', async (req, res) => {
     })
 })
 
+// US 9 - Retrieve user data with specific properties - id, name, company, emailDomainName, state, zip
+
+app.get('/userData', async (req, res) => {
+    fs.readFile("./newData.json", "utf8", (err, data) => {
+        if (err) {
+            console.log("File read failed:", err)
+            res.status(500).json({
+                error: {
+                    message: "Error retrieving the data"
+                }
+            })
+        }else{
+            var obj = JSON.parse(data)
+            var dataArray = obj.newData
+            var resultArray = [];
+            for(i =0 ; i < dataArray.length; i++) {
+                email = dataArray[i].email
+                domainName = email.substring(email.lastIndexOf("@")+1)
+                /*
+                -- Prev code without lastIndexOf function --
+                splitEmail = email.split('@') //split with @
+                //console.log(splitEmail)
+                lastEle = split.slice(-1) // store the last element
+                //console.log(lastEle)
+                */
+
+                address = dataArray[i].address
+                splitAddress = address.split(',')
+                //console.log(splitAddress)
+                stateName = splitAddress[splitAddress.length -2]
+
+                resultArray.push({
+                    id: dataArray[i].id,
+                    name: dataArray[i].name,
+                    company: dataArray[i].company,
+                    mailDomainName : domainName,
+                    state : stateName
+                })
+            
+            }
+            //console.log(resultArray);
+            res.status(200).json({
+            response:{
+                result : resultArray
+                    }
+            })    
+
+        }
+    })
+})
+
+
+
 app.listen(port, () => {
     console.log('The server is running on port', port);
 });
