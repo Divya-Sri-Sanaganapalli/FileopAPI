@@ -479,6 +479,11 @@ app.get('/conditionalCheckV3', async (req, res) => {
                             })
                 }
             }   
+            res.status(200).json({
+                response:{
+                    message : "No match found"
+                        }
+            })
             console.log(resultArray);
             res.status(200).json({
             response:{
